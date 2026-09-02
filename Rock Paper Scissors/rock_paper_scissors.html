@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 450px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .score {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .score-item {
+            color: #666;
+        }
+        
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        button:hover {
+            background: #764ba2;
+        }
+        
+        .result-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            min-height: 80px;
+        }
+        
+        .result-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .choices-display {
+            font-size: 36px;
+            margin: 10px 0;
+        }
+        
+        .winner {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .loser {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .draw {
+            color: #f39c12;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .reset-btn {
+            background: #95a5a6;
+        }
+        
+        .reset-btn:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Rock Paper Scissors</h1>
+        
+        <div class="score">
+            <div class="score-item">You: <span id="playerScore">0</span></div>
+            <div class="score-item">Computer: <span id="computerScore">0</span></div>
+        </div>
+        
+        <div class="choices">
+            <button onclick="playGame('rock')">🪨 Rock</button>
+            <button onclick="playGame('paper')">📄 Paper</button>
+            <button onclick="playGame('scissors')">✂️ Scissors</button>
+        </div>
+        
+        <div class="result-box">
+            <div class="result-text">Your choice: <span id="playerChoice">-</span></div>
+            <div class="result-text">Computer: <span id="computerChoice">-</span></div>
+            <div class="choices-display" id="resultDisplay">🎮</div>
+            <div id="resultMessage">Click a button to start!</div>
+        </div>
+        
+        <button class="reset-btn" onclick="resetGame()">Reset</button>
+    </div>
+    
+    <script>
+        let playerScore = 0;
+        let computerScore = 0;
+        
+        const choices = ['rock', 'paper', 'scissors'];
+        const emojis = { rock: '🪨', paper: '📄', scissors: '✂️' };
+        
+        function getComputerChoice() {
+            return choices[Math.floor(Math.random() * 3)];
+        }
+        
+        function determineWinner(player, computer) {
+            if (player === computer) return 'draw';
+            
+            if (player === 'rock' && computer === 'scissors') return 'win';
+            if (player === 'paper' && computer === 'rock') return 'win';
+            if (player === 'scissors' && computer === 'paper') return 'win';
+            
+            return 'lose';
+        }
+        
+        function playGame(player) {
+            const computer = getComputerChoice();
+            const result = determineWinner(player, computer);
+            
+            document.getElementById('playerChoice').textContent = emojis[player];
+            document.getElementById('computerChoice').textContent = emojis[computer];
+            
+            const resultDisplay = document.getElementById('resultDisplay');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            if (result === 'win') {
+                playerScore++;
+                resultMessage.innerHTML = '<div class="winner">🎉 You Win!</div>';
+                resultDisplay.textContent = '✨';
+            } else if (result === 'lose') {
+                computerScore++;
+                resultMessage.innerHTML = '<div class="loser">😢 You Lose!</div>';
+                resultDisplay.textContent = '😢';
+            } else {
+                resultMessage.innerHTML = '<div class="draw">🤝 Draw!</div>';
+                resultDisplay.textContent = '🤝';
+            }
+            
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('computerScore').textContent = computerScore;
+        }
+        
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            document.getElementById('playerScore').textContent = '0';
+            document.getElementById('computerScore').textContent = '0';
+            document.getElementById('playerChoice').textContent = '-';
+            document.getElementById('computerChoice').textContent = '-';
+            document.getElementById('resultDisplay').textContent = '🎮';
+            document.getElementById('resultMessage').textContent = 'Click a button to start!';
+        }
+    </script>
+</body>
+</html>
