@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quote Generator</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient-1: #667eea;
+            --bg-gradient-2: #764ba2;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2d3748;
+            --text-sub: #718096;
+            --quote-bg: #f7fafc;
+            --primary-btn: #667eea;
+            --primary-btn-hover: #5a67d8;
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient-1: #0f172a;
+            --bg-gradient-2: #1e1b4b;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --quote-bg: #0f172a;
+            --primary-btn: #6366f1;
+            --primary-btn-hover: #4f46e5;
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--text-main);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .quote-box {
+            background: var(--quote-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .quote-text {
+            font-size: 1.15rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            font-style: italic;
+            line-height: 1.6;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .quote-author {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            text-align: right;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: 1px solid var(--text-sub);
+            color: var(--text-main);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-btn);
+            color: white;
+            border-color: var(--primary-btn);
+            transform: translateY(-2px);
+        }
+
+        .main-btn {
+            background: var(--primary-btn);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .main-btn:hover {
+            background: var(--primary-btn-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            bottom: 20px;
+            opacity: 1;
+        }
+
+        .fade-out { opacity: 0; }
+        .fade-in { opacity: 1; }
+
+        .hint {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-quote-left"></i> Quote Vault</h1>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+
+        <div class="quote-box">
+            <div class="quote-text" id="quoteText">Click below to fetch a new quote!</div>
+            <div class="quote-author" id="quoteAuthor">- Anonymous</div>
+        </div>
+
+        <div class="actions">
+            <div class="social-btns">
+                <button class="icon-btn" id="copyBtn" title="Copy to Clipboard">
+                    <i class="fa-regular fa-copy"></i>
+                </button>
+                <button class="icon-btn" id="tweetBtn" title="Share on Twitter">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </button>
+            </div>
+            <button class="main-btn" id="newQuoteBtn">
+                <i class="fa-solid fa-rotate-right" id="btnIcon"></i> New Quote
+            </button>
+        </div>
+        
+        <p class="hint">Tip: Press <b>Spacebar</b> for a new quote!</p>
+        <div class="toast" id="toast">Copied to clipboard!</div>
+    </div>
+
+    <script>
+        // Local Fallback Quotes
+        const localQuotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
+            { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle" }
+        ];
+
+        // DOM Elements
+        const quoteText = document.getElementById('quoteText');
+        const quoteAuthor = document.getElementById('quoteAuthor');
+        const newQuoteBtn = document.getElementById('newQuoteBtn');
+        const btnIcon = document.getElementById('btnIcon');
+        const themeToggle = document.getElementById('themeToggle');
+        const copyBtn = document.getElementById('copyBtn');
+        const tweetBtn = document.getElementById('tweetBtn');
+        const toast = document.getElementById('toast');
+
+        // Dark Mode Toggle Logic
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            themeToggle.querySelector('i').className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        });
+
+        // Fetch Quote Logic
+        async function getQuote() {
+            // UI Loader State
+            btnIcon.classList.add('fa-spin');
+            quoteText.classList.add('fade-out');
+            quoteAuthor.classList.add('fade-out');
+
+            setTimeout(async () => {
+                try {
+                    // Try API fetch
+                    const response = await fetch('https://api.quotable.io/random');
+                    if (!response.ok) throw new Error('API down');
+                    const data = await response.json();
+                    
+                    updateUI(`"${data.content}"`, `- ${data.author}`);
+                } catch (error) {
+                    // Fallback to local quotes if offline or API fails
+                    const randomQuote = localQuotes[Math.floor(Math.random() * localQuotes.length)];
+                    updateUI(`"${randomQuote.text}"`, `- ${randomQuote.author}`);
+                } finally {
+                    btnIcon.classList.remove('fa-spin');
+                }
+            }, 300);
+        }
+
+        function updateUI(text, author) {
+            quoteText.textContent = text;
+            quoteAuthor.textContent = author;
+            quoteText.classList.remove('fade-out');
+            quoteAuthor.classList.remove('fade-out');
+        }
+
+        // Copy to Clipboard
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = `${quoteText.textContent} ${quoteAuthor.textContent}`;
+            navigator.clipboard.writeText(textToCopy);
+            showToast('Copied to clipboard!');
+        });
+
+        // Tweet Quote
+        tweetBtn.addEventListener('click', () => {
+            const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(quoteText.textContent + ' ' + quoteAuthor.textContent)}`;
+            window.open(tweetUrl, '_blank');
+        });
+
+        // Toast Notification Helper
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Keyboard Shortcut (Spacebar)
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target === document.body) {
+                e.preventDefault();
+                getQuote();
+            }
+        });
+
+        // Event Listeners
+        newQuoteBtn.addEventListener('click', getQuote);
+
+        // Initialize first quote
+        getQuote();
+    </script>
+</body>
+</html>
